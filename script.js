@@ -92,8 +92,42 @@ async function loadGames(){
 
 
 
-    let targetDate =
-    new Date();
+    let targetDate = new Date();
+
+
+// LIVE SESSION
+
+if(dateSelect.value === "session"){
+
+
+    let savedStart =
+    localStorage.getItem(
+        "sessionStart"
+    );
+
+
+    if(!savedStart){
+
+        savedStart =
+        Date.now();
+
+
+        localStorage.setItem(
+            "sessionStart",
+            savedStart
+        );
+
+    }
+
+
+}
+else{
+
+    localStorage.removeItem(
+        "sessionStart"
+    );
+
+}
 
 
 
@@ -177,41 +211,68 @@ async function loadGames(){
         // Filter by selected date
 
         games =
-        games.filter(game=>{
+games.filter(game=>{
 
 
-            const gameDate =
-            new Date(
-                game.end_time * 1000
-            );
+    const gameDate =
+    new Date(
+        game.end_time * 1000
+    );
 
 
-            return (
 
-                gameDate.getDate()
-                ===
-                targetDate.getDate()
+    // FROM NOW MODE
 
+    if(
+        dateSelect.value === "session"
+    ){
 
-                &&
-
-
-                gameDate.getMonth()
-                ===
-                targetDate.getMonth()
-
-
-                &&
+        const start =
+        Number(
+            localStorage.getItem(
+                "sessionStart"
+            )
+        );
 
 
-                gameDate.getFullYear()
-                ===
-                targetDate.getFullYear()
+        return (
+            game.end_time * 1000
+            >
+            start
+        );
 
-            );
+    }
 
 
-        });
+
+    // NORMAL DATE FILTER
+
+    return (
+
+        gameDate.getDate()
+        ===
+        targetDate.getDate()
+
+
+        &&
+
+
+        gameDate.getMonth()
+        ===
+        targetDate.getMonth()
+
+
+        &&
+
+
+        gameDate.getFullYear()
+        ===
+        targetDate.getFullYear()
+
+    );
+
+
+});
 
 
 
