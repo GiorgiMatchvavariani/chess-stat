@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Chess Tracker</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>♟ Chess Tracker</h1>
+        <p>Chess.com performance dashboard</p>
+    </header>
+
+
+    <section class="stats">
+
+        <div class="card">
+
+            <div class="card-title">
+                Overall Stats
+            </div>
+
+
+            <div class="stat">
+                <span>Games</span>
+                <strong id="games">0</strong>
+            </div>
+
+
+            <div class="stat">
+                <span>Wins</span>
+                <strong id="wins">0</strong>
+            </div>
+
+
+            <div class="stat">
+                <span>Losses</span>
+                <strong id="losses">0</strong>
+            </div>
+
+
+            <div class="stat">
+                <span>Draws</span>
+                <strong id="draws">0</strong>
+            </div>
+
+
+            <div class="stat">
+                <span>Rating</span>
+                <strong id="rating">0</strong>
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <section class="form">
+
+        <h2>Add Session</h2>
+
+
+        <label>
+            Player Name
+        </label>
+
+        <input 
+            id="player"
+            placeholder="magnuscarlsen"
+        >
+
+
+
+        <label>
+            Date
+        </label>
+
+        <select id="date">
+
+            <option value="today">
+                Today
+            </option>
+
+            <option value="yesterday">
+                Yesterday
+            </option>
+
+            <option value="custom">
+                Custom Date
+            </option>
+
+        </select>
+
+
+        <input 
+            id="customDate"
+            type="date"
+            style="display:none;"
+        >
+
+
+
+        <label>
+            Game Type
+        </label>
+
+
+        <select id="gameType">
+
+            <option value="bullet">
+                Bullet
+            </option>
+
+            <option value="blitz">
+                Blitz
+            </option>
+
+            <option value="rapid">
+                Rapid
+            </option>
+
+        </select>
+
+
+
+        <button id="searchBtn">
+            Load Games
+        </button>
+
+
+    </section>
+
+
+</div>
+
+
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
