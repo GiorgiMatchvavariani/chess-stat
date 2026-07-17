@@ -2,121 +2,37 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Chess Tracker</title>
+    <title>Chess Dashboard</title>
 
     <link rel="stylesheet" href="style.css">
+
 </head>
+
 
 <body>
 
+
 <div class="container">
 
-    <header>
-        <h1>♟ Chess Tracker</h1>
-        <p>Chess.com performance dashboard</p>
-    </header>
 
-
-    <section class="stats">
-
-        <div class="card">
-
-            <div class="card-title">
-                Overall Stats
-            </div>
-
-
-            <div class="stat">
-                <span>Games</span>
-                <strong id="games">0</strong>
-            </div>
-
-
-            <div class="stat">
-                <span>Wins</span>
-                <strong id="wins">0</strong>
-            </div>
-
-
-            <div class="stat">
-                <span>Losses</span>
-                <strong id="losses">0</strong>
-            </div>
-
-
-            <div class="stat">
-                <span>Draws</span>
-                <strong id="draws">0</strong>
-            </div>
-
-
-            <div class="stat">
-                <span>Rating</span>
-                <strong id="rating">0</strong>
-            </div>
-
-
-        </div>
-
-    </section>
+    <h1>Chess Dashboard</h1>
 
 
 
-    <section class="form">
+    <div class="controls">
 
-        <h2>Add Session</h2>
-
-
-        <label>
-            Player Name
-        </label>
 
         <input 
             id="player"
-            placeholder="magnuscarlsen"
+            type="text"
+            placeholder="Chess.com username"
         >
 
-
-
-        <label>
-            Date
-        </label>
-
-        <select id="date">
-
-    <option value="today">
-        Today
-    </option>
-
-    <option value="yesterday">
-        Yesterday
-    </option>
-
-    <option value="custom">
-        Custom Date
-    </option>
-
-    <option value="session">
-        From Now
-    </option>
-
-</select>
-
-
-        <input 
-            id="customDate"
-            type="date"
-            style="display:none;"
-        >
-
-
-
-        <label>
-            Game Type
-        </label>
 
 
         <select id="gameType">
@@ -125,7 +41,7 @@
                 Bullet
             </option>
 
-            <option value="blitz">
+            <option value="blitz" selected>
                 Blitz
             </option>
 
@@ -137,19 +53,250 @@
 
 
 
+
+        <select id="date">
+
+
+            <option value="today">
+                Today
+            </option>
+
+
+            <option value="yesterday">
+                Yesterday
+            </option>
+
+
+            <option value="custom">
+                Custom Date
+            </option>
+
+
+            <option value="session">
+                From Now
+            </option>
+
+
+        </select>
+
+
+
+
+        <input
+            id="customDate"
+            type="date"
+            style="display:none;"
+        >
+
+
+
         <button id="searchBtn">
-            Load Games
+            Update
         </button>
 
 
-    </section>
+    </div>
+
+
+
+
+
+    <div class="status">
+
+
+        <span id="connection">
+            ● Waiting
+        </span>
+
+
+        <span id="lastUpdate">
+            
+        </span>
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="dashboard">
+
+
+
+        <div class="card">
+
+            <h3>
+                Games
+            </h3>
+
+            <strong id="games">
+                0
+            </strong>
+
+        </div>
+
+
+
+
+
+        <div class="card">
+
+            <h3>
+                Wins
+            </h3>
+
+            <strong id="wins">
+                0
+            </strong>
+
+        </div>
+
+
+
+
+
+        <div class="card">
+
+            <h3>
+                Losses
+            </h3>
+
+            <strong id="losses">
+                0
+            </strong>
+
+        </div>
+
+
+
+
+
+        <div class="card">
+
+            <h3>
+                Draws
+            </h3>
+
+            <strong id="draws">
+                0
+            </strong>
+
+        </div>
+
+
+
+
+
+        <div class="card">
+
+            <h3>
+                Rating
+            </h3>
+
+            <strong id="rating">
+                0
+            </strong>
+
+        </div>
+
+
+
+
+
+        <div class="card">
+
+            <h3>
+                Accuracy
+            </h3>
+
+            <strong id="accuracy">
+                N/A
+            </strong>
+
+        </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="games-list">
+
+
+        <h2>
+            Saved Games
+        </h2>
+
+
+        <table>
+
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Date
+                    </th>
+
+
+                    <th>
+                        Opponent
+                    </th>
+
+
+                    <th>
+                        Result
+                    </th>
+
+
+                    <th>
+                        Rating
+                    </th>
+
+
+                    <th>
+                        Accuracy
+                    </th>
+
+
+                </tr>
+
+
+            </thead>
+
+
+
+            <tbody id="gamesTable">
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+
 
 
 </div>
 
 
 
+
 <script src="script.js"></script>
+
 
 </body>
 
