@@ -1,141 +1,44 @@
-// ================================
-// ELEMENTS
-// ================================
+* {
 
-const playerInput = document.getElementById("player");
-const dateSelect = document.getElementById("date");
-const customDate = document.getElementById("customDate");
-const gameType = document.getElementById("gameType");
+    box-sizing: border-box;
 
-const searchBtn = document.getElementById("searchBtn");
+    font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
 
-const gamesEl = document.getElementById("games");
-const winsEl = document.getElementById("wins");
-const lossesEl = document.getElementById("losses");
-const drawsEl = document.getElementById("draws");
-const ratingEl = document.getElementById("rating");
+}
 
 
 
-// ================================
-// LOAD SETTINGS
-// ================================
+body {
 
-window.addEventListener("load", ()=>{
+    margin:0;
 
-    playerInput.value =
-    localStorage.getItem("player") || "";
+    min-height:100vh;
 
-    gameType.value =
-    localStorage.getItem("gameType") || "blitz";
+    background:#0f1115;
 
-    dateSelect.value =
-    localStorage.getItem("date") || "today";
+    color:#e8e8e8;
 
+    display:flex;
 
-});
+    justify-content:center;
 
+    align-items:flex-start;
 
+    padding:30px;
 
-// ================================
-// SAVE SETTINGS
-// ================================
-
-playerInput.addEventListener("change", ()=>{
-
-    localStorage.setItem(
-        "player",
-        playerInput.value
-    );
-
-});
-
-
-gameType.addEventListener("change", ()=>{
-
-    localStorage.setItem(
-        "gameType",
-        gameType.value
-    );
-
-});
-
-
-dateSelect.addEventListener("change", ()=>{
-
-    localStorage.setItem(
-        "date",
-        dateSelect.value
-    );
-
-
-    customDate.style.display =
-    dateSelect.value === "custom"
-    ?
-    "block"
-    :
-    "none";
-
-});
+}
 
 
 
-// ================================
-// BUTTON
-// ================================
 
-searchBtn.addEventListener(
-"click",
-loadGames
-);
+.container {
 
+    width:100%;
 
-
-// ================================
-// MAIN
-// ================================
-
-async function loadGames(){
-
-
-    const player =
-    playerInput.value
-    .trim()
-    .toLowerCase();
-
-
-
-    if(!player){
-
-        alert("Enter player name");
-        return;
-
-    }
-
-
-
-    localStorage.setItem(
-        "player",
-        player
-    );
-
-
-
-    // SESSION MODE
-
-    if(dateSelect.value === "session"){
-
-        await startSession(
-            player
-        );
-
-    }
-
-
-
-    await fetchGames(
-        player
-    );
+    max-width:900px;
 
 }
 
@@ -143,82 +46,150 @@ async function loadGames(){
 
 
 
-// ================================
-// START LIVE SESSION
-// ================================
+h1 {
 
-async function startSession(player){
+    text-align:center;
 
+    margin-bottom:25px;
 
-    const rating =
-    await getCurrentRating(
-        player,
-        gameType.value
-    );
+    font-size:28px;
 
-
-    localStorage.setItem(
-        "sessionStart",
-        Date.now()
-    );
-
-
-    localStorage.setItem(
-        "sessionRating",
-        rating
-    );
-
+    color:#ffffff;
 
 }
 
 
 
-// ================================
-// GET CURRENT RATING
-// ================================
-
-async function getCurrentRating(
-player,
-type
-){
 
 
-    const response =
-    await fetch(
+.controls {
 
-    `https://api.chess.com/pub/player/${player}/stats`
+    display:flex;
 
-    );
+    gap:10px;
 
+    flex-wrap:wrap;
 
-    const data =
-    await response.json();
+    justify-content:center;
+
+    margin-bottom:15px;
+
+}
 
 
 
-    let key;
+
+input,
+select,
+button {
 
 
-    if(type==="bullet")
-        key="chess_bullet";
+    background:#181c24;
+
+    color:#ffffff;
+
+    border:1px solid #303642;
+
+    border-radius:8px;
+
+    padding:10px 14px;
+
+    font-size:14px;
+
+}
 
 
-    if(type==="blitz")
-        key="chess_blitz";
+
+input::placeholder {
+
+    color:#888;
+
+}
 
 
-    if(type==="rapid")
-        key="chess_rapid";
+
+button {
+
+    cursor:pointer;
+
+    background:#2563eb;
+
+    border:none;
+
+    transition:.2s;
+
+}
 
 
 
-    return (
-        data[key]
-        ?.last
-        ?.rating
-        ||
-        0
-    );
+button:hover {
+
+    background:#1d4ed8;
+
+}
+
+
+
+
+
+
+
+.status {
+
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin:15px 0;
+
+    color:#999;
+
+    font-size:13px;
+
+}
+
+
+
+
+
+.dashboard {
+
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(3,1fr);
+
+    gap:15px;
+
+}
+
+
+
+
+
+.card {
+
+
+    width:100%;
+
+    aspect-ratio:1/1;
+
+    background:#171a21;
+
+    border:1px solid #262b35;
+
+    border-radius:15px;
+
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
 
 
 }
@@ -227,374 +198,174 @@ type
 
 
 
-// ================================
-// FETCH GAMES
-// ================================
+.card h3 {
 
-async function fetchGames(player){
 
+    margin:0 0 15px;
 
-    let target =
-    new Date();
+    font-size:14px;
 
+    color:#9ca3af;
 
-
-    if(dateSelect.value==="yesterday"){
-
-        target.setDate(
-            target.getDate()-1
-        );
-
-    }
-
-
-
-    if(dateSelect.value==="custom"){
-
-        target =
-        new Date(
-            customDate.value
-        );
-
-    }
-
-
-
-    // SESSION DATE
-
-    if(dateSelect.value==="session"){
-
-
-        target =
-        new Date(
-            Number(
-                localStorage.getItem(
-                    "sessionStart"
-                )
-            )
-        );
-
-
-    }
-
-
-
-
-
-    const year =
-    target.getFullYear();
-
-
-    const month =
-    String(
-    target.getMonth()+1
-    )
-    .padStart(2,"0");
-
-
-
-
-    const response =
-    await fetch(
-
-    `https://api.chess.com/pub/player/${player}/games/${year}/${month}`
-
-    );
-
-
-
-    const data =
-    await response.json();
-
-
-
-    let games =
-    data.games || [];
-
-
-
-
-
-    games =
-    games.filter(game=>{
-
-
-        const gameTime =
-        game.end_time * 1000;
-
-
-
-        // LIVE SESSION
-
-        if(
-        dateSelect.value==="session"
-        ){
-
-
-            const start =
-            Number(
-            localStorage.getItem(
-                "sessionStart"
-            ));
-
-
-            return gameTime > start;
-
-        }
-
-
-
-        // NORMAL DATE
-
-
-        const d =
-        new Date(gameTime);
-
-
-
-        return (
-
-            d.getDate()
-            ===
-            target.getDate()
-
-            &&
-
-            d.getMonth()
-            ===
-            target.getMonth()
-
-            &&
-
-            d.getFullYear()
-            ===
-            target.getFullYear()
-
-        );
-
-
-    });
-
-
-
-
-
-    games =
-    games.filter(game=>
-
-        game.time_class
-        ===
-        gameType.value
-
-    );
-
-
-
-
-
-    calculateStats(
-        games,
-        player
-    );
+    font-weight:500;
 
 }
 
 
 
 
-// ================================
-// CALCULATE STATS
-// ================================
+.card strong {
 
-function calculateStats(
-games,
-player
-){
 
+    font-size:36px;
 
-    let wins=0;
+    color:#ffffff;
 
-    let losses=0;
+}
 
-    let draws=0;
 
 
-    let ratingChange=0;
 
 
-    let previousRating=null;
 
+.games-list {
 
 
+    margin-top:30px;
 
-    games.sort(
-        (a,b)=>
-        a.end_time-b.end_time
-    );
 
+    background:#171a21;
 
+    padding:20px;
 
+    border-radius:15px;
 
-
-    if(
-    dateSelect.value==="session"
-    ){
-
-
-        previousRating =
-        Number(
-        localStorage.getItem(
-            "sessionRating"
-        ));
-
-
-    }
-
-
-
-
-
-    games.forEach(game=>{
-
-
-        let data;
-
-
-
-        if(
-        game.white.username
-        .toLowerCase()
-        ===
-        player
-        ){
-
-            data =
-            game.white;
-
-        }
-        else{
-
-            data =
-            game.black;
-
-        }
-
-
-
-
-
-        // RESULT
-
-        switch(data.result){
-
-
-            case "win":
-
-                wins++;
-                break;
-
-
-            case "stalemate":
-            case "repetition":
-            case "agreed":
-            case "insufficient":
-            case "50move":
-            case "timevsinsufficient":
-
-                draws++;
-                break;
-
-
-            default:
-
-                losses++;
-
-        }
-
-
-
-
-        // RATING
-
-        if(
-        data.rating
-        &&
-        previousRating!==null
-        ){
-
-
-            ratingChange +=
-            data.rating
-            -
-            previousRating;
-
-
-        }
-
-
-
-        if(data.rating){
-
-            previousRating =
-            data.rating;
-
-        }
-
-
-    });
-
-
-
-
-
-    gamesEl.textContent =
-    games.length;
-
-
-    winsEl.textContent =
-    wins;
-
-
-    lossesEl.textContent =
-    losses;
-
-
-    drawsEl.textContent =
-    draws;
-
-
-    ratingEl.textContent =
-    ratingChange>=0
-    ?
-    "+"+ratingChange
-    :
-    ratingChange;
-
+    border:1px solid #262b35;
 
 
 }
 
 
 
-// ================================
-// AUTO UPDATE EVERY 1 MINUTE
-// ================================
-
-setInterval(()=>{
 
 
-    if(
-    playerInput.value.trim()
-    !== ""
-    ){
+.games-list h2 {
 
-        fetchGames(
-            playerInput.value
-            .trim()
-            .toLowerCase()
-        );
+    margin-top:0;
+
+    font-size:20px;
+
+}
+
+
+
+
+
+table {
+
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+
+
+
+th {
+
+
+    text-align:left;
+
+    color:#9ca3af;
+
+    font-size:13px;
+
+    padding:10px;
+
+    border-bottom:1px solid #303642;
+
+}
+
+
+
+
+td {
+
+
+    padding:10px;
+
+    border-bottom:1px solid #242936;
+
+    font-size:14px;
+
+}
+
+
+
+
+
+
+.win {
+
+    color:#22c55e;
+
+}
+
+
+.loss {
+
+    color:#ef4444;
+
+}
+
+
+.draw {
+
+    color:#eab308;
+
+}
+
+
+
+
+
+
+@media(max-width:700px){
+
+
+    .dashboard {
+
+        grid-template-columns:
+        repeat(2,1fr);
 
     }
 
 
-},60000);
+}
+
+
+
+
+
+@media(max-width:450px){
+
+
+    body {
+
+        padding:15px;
+
+    }
+
+
+
+    .dashboard {
+
+        grid-template-columns:
+        1fr;
+
+    }
+
+
+}
