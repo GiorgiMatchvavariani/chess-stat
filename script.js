@@ -1,75 +1,34 @@
 // ======================================
-// ELEMENTSasd
+// ELEMENTS
 // ======================================
 
+const playerInput = document.getElementById("player");
+const gameType = document.getElementById("gameType");
+const dateSelect = document.getElementById("date");
+const customDate = document.getElementById("customDate");
+const searchBtn = document.getElementById("searchBtn");
 
-const playerInput =
-document.getElementById("player");
+const gamesEl = document.getElementById("games");
+const winsEl = document.getElementById("wins");
+const lossesEl = document.getElementById("losses");
+const drawsEl = document.getElementById("draws");
+const ratingEl = document.getElementById("rating");
+const accuracyEl = document.getElementById("accuracy");
 
+const connection = document.getElementById("connection");
+const lastUpdate = document.getElementById("lastUpdate");
 
-const gameType =
-document.getElementById("gameType");
-
-
-const dateSelect =
-document.getElementById("date");
-
-
-const customDate =
-document.getElementById("customDate");
-
-
-const searchBtn =
-document.getElementById("searchBtn");
-
-
-
-const gamesEl =
-document.getElementById("games");
-
-
-const winsEl =
-document.getElementById("wins");
-
-
-const lossesEl =
-document.getElementById("losses");
-
-
-const drawsEl =
-document.getElementById("draws");
-
-
-const ratingEl =
-document.getElementById("rating");
-
-
-const accuracyEl =
-document.getElementById("accuracy");
-
-
-const table =
-document.getElementById("gamesTable");
-
-
-
-const connection =
-document.getElementById("connection");
-
-
-const lastUpdate =
-document.getElementById("lastUpdate");
-
+const gamesTable = document.getElementById("gamesTable");
 
 
 
 
 // ======================================
-// LOCAL STORAGE DATABASE
+// LOCAL STORAGE
 // ======================================
 
 
-function getDatabase(){
+function getGamesDB(){
 
     return JSON.parse(
         localStorage.getItem("gamesDB")
@@ -79,7 +38,7 @@ function getDatabase(){
 
 
 
-function saveDatabase(data){
+function saveGamesDB(data){
 
     localStorage.setItem(
         "gamesDB",
@@ -91,32 +50,27 @@ function saveDatabase(data){
 
 
 
+
 // ======================================
-// SETTINGS LOAD
+// LOAD SETTINGS
 // ======================================
 
-
-window.addEventListener(
-"load",
-()=>{
+window.addEventListener("load", ()=>{
 
 
-playerInput.value =
-localStorage.getItem("player")
-|| "";
+    playerInput.value =
+    localStorage.getItem("player")
+    || "";
 
 
-
-gameType.value =
-localStorage.getItem("type")
-|| "blitz";
-
+    gameType.value =
+    localStorage.getItem("gameType")
+    || "blitz";
 
 
-dateSelect.value =
-localStorage.getItem("date")
-|| "today";
-
+    dateSelect.value =
+    localStorage.getItem("date")
+    || "today";
 
 
 });
@@ -125,20 +79,18 @@ localStorage.getItem("date")
 
 
 
-
 // ======================================
-// SETTINGS SAVE
+// SAVE SETTINGS
 // ======================================
-
 
 playerInput.addEventListener(
 "change",
 ()=>{
 
-localStorage.setItem(
-"player",
-playerInput.value
-);
+    localStorage.setItem(
+        "player",
+        playerInput.value
+    );
 
 });
 
@@ -148,10 +100,10 @@ gameType.addEventListener(
 "change",
 ()=>{
 
-localStorage.setItem(
-"type",
-gameType.value
-);
+    localStorage.setItem(
+        "gameType",
+        gameType.value
+    );
 
 });
 
@@ -161,24 +113,22 @@ dateSelect.addEventListener(
 "change",
 ()=>{
 
-
-localStorage.setItem(
-"date",
-dateSelect.value
-);
-
+    localStorage.setItem(
+        "date",
+        dateSelect.value
+    );
 
 
-customDate.style.display =
-dateSelect.value==="custom"
-?
-"block"
-:
-"none";
-
+    customDate.style.display =
+    dateSelect.value === "custom"
+    ?
+    "block"
+    :
+    "none";
 
 
 });
+
 
 
 
@@ -191,11 +141,9 @@ dateSelect.value==="custom"
 
 searchBtn.addEventListener(
 "click",
-()=>{
+updateDashboard
+);
 
-startUpdate();
-
-});
 
 
 
@@ -206,84 +154,63 @@ startUpdate();
 // MAIN UPDATE
 // ======================================
 
-
-async function startUpdate(){
-
+async function updateDashboard(){
 
 
-const player =
-playerInput.value
-.trim()
+    const player =
+    playerInput.value.trim();
 
 
 
+    if(!player){
 
-if(!player){
+        return;
 
-return;
-
-}
-
+    }
 
 
 
-try{
+    try{
 
 
-await fetchGames(
-player
-);
-
-
-
-connection.innerHTML =
-"● Connected";
+        await fetchGames(player);
 
 
 
-connection.style.color =
-"#22c55e";
+        connection.textContent =
+        "● Connected";
+
+
+        lastUpdate.textContent =
+        "Updated: "
+        +
+        new Date()
+        .toLocaleTimeString();
 
 
 
-lastUpdate.textContent =
-"Updated: "
-+
-new Date()
-.toLocaleTimeString();
+    }
+    catch(error){
+
+
+        console.log(error);
 
 
 
-}
-catch(error){
+        connection.textContent =
+        "● Using saved data";
 
 
-
-console.log(error);
-
-
-
-connection.innerHTML =
-"● Offline cache";
+        displayStats(
+            player
+        );
 
 
-connection.style.color =
-"#eab308";
-
-
-
-displayStats(
-player
-);
+    }
 
 
 
 }
-
-
-
-}
-
 
 
 
@@ -292,207 +219,227 @@ player
 
 
 // ======================================
-// FETCH CHESS.COM GAMES
+// FETCH API
 // ======================================
-
 
 async function fetchGames(player){
 
 
 
-let target =
-new Date();
+    let target =
+    new Date();
 
 
 
+    let sessionStart = null;
 
-if(dateSelect.value==="yesterday"){
 
 
-target.setDate(
-target.getDate()-1
-);
 
+    if(dateSelect.value==="yesterday"){
 
-}
 
+        target.setDate(
+            target.getDate()-1
+        );
 
 
+    }
 
 
-if(dateSelect.value==="custom"){
 
 
-target =
-new Date(
-customDate.value
-);
+    if(dateSelect.value==="custom"){
 
 
-}
+        target =
+        new Date(
+            customDate.value
+        );
 
 
+    }
 
 
 
-let startTime =
-0;
 
+    if(dateSelect.value==="session"){
 
 
-if(dateSelect.value==="session"){
+        sessionStart =
+        Number(
+            localStorage.getItem(
+                "sessionStart"
+            )
+        );
 
 
-startTime =
-Number(
-localStorage.getItem(
-"sessionStart"
-)
-);
 
+        if(!sessionStart){
 
-target =
-new Date(
-startTime
-);
 
+            localStorage.setItem(
+                "sessionStart",
+                Date.now()
+            );
 
-}
 
+            sessionStart =
+            Date.now();
 
 
+        }
 
-const year =
-target.getFullYear();
 
 
+        target =
+        new Date(
+            sessionStart
+        );
 
-const month =
-String(
-target.getMonth()+1
-)
-.padStart(2,"0");
 
+    }
 
 
 
 
-const url =
 
-`https://api.chess.com/pub/player/${player}/games/${year}/${month}`;
 
+    const year =
+    target.getFullYear();
 
 
 
+    const month =
+    String(
+        target.getMonth()+1
+    )
+    .padStart(2,"0");
 
-const response =
-await fetch(url);
 
 
 
-if(!response.ok){
 
-throw new Error(
-"API error"
-);
+    const url =
 
-}
+    `https://api.chess.com/pub/player/${player}/games/${year}/${month}`;
 
 
 
+    console.log(
+        "API:",
+        url
+    );
 
 
-const data =
-await response.json();
 
 
 
-let games =
-data.games || [];
+    const response =
+    await fetch(url);
 
 
 
 
+    if(!response.ok){
 
+        throw new Error(
+            "API ERROR "
+            +
+            response.status
+        );
 
-games =
-games.filter(game=>{
+    }
 
 
-const time =
-game.end_time*1000;
 
 
+    const data =
+    await response.json();
 
-if(dateSelect.value==="session"){
 
 
-return time > startTime;
+    let games =
+    data.games || [];
 
 
-}
 
 
+    games =
+    games.filter(game=>{
 
 
-const d =
-new Date(time);
+        const time =
+        game.end_time*1000;
 
 
 
-return (
+        if(dateSelect.value==="session"){
 
-d.getDate()
-===
-target.getDate()
 
-&&
+            return time > sessionStart;
 
-d.getMonth()
-===
-target.getMonth()
 
-&&
+        }
 
-d.getFullYear()
-===
-target.getFullYear()
 
-);
 
 
-});
+        const d =
+        new Date(time);
 
 
 
+        return (
 
+            d.getDate()
+            ===
+            target.getDate()
 
-games =
-games.filter(game=>
+            &&
 
-game.time_class
-===
-gameType.value
+            d.getMonth()
+            ===
+            target.getMonth()
 
-);
+            &&
 
+            d.getFullYear()
+            ===
+            target.getFullYear()
 
+        );
 
 
+    });
 
-saveGames(
-games,
-player
-);
 
 
 
 
+    games =
+    games.filter(game=>
 
-displayStats(
-player
-);
+        game.time_class
+        ===
+        gameType.value
 
+    );
+
+
+
+
+
+    saveNewGames(
+        games,
+        player
+    );
+
+
+
+    displayStats(
+        player
+    );
 
 
 }
@@ -505,149 +452,145 @@ player
 
 
 // ======================================
-// SAVE NEW GAMES
+// SAVE GAMES LOCALLY
 // ======================================
 
 
-function saveGames(
+function saveNewGames(
 games,
 player
 ){
 
 
-let db =
-getDatabase();
+    let db =
+    getGamesDB();
 
 
 
+    games.forEach(game=>{
 
-games.forEach(game=>{
 
+        const id =
+        game.url
+        ||
+        game.end_time;
 
-const id =
-game.url
-||
-game.end_time;
 
 
+        const exists =
+        db.some(
+            g=>g.id===id
+        );
 
-const exists =
-db.find(
-g=>g.id===id
-);
 
 
+        if(exists){
 
-if(exists){
+            return;
 
-return;
+        }
 
-}
 
 
 
+        const isWhite =
 
+        game.white.username
+        .toLowerCase()
 
-let white =
-game.white.username
+        ===
 
-===
-player;
+        player.toLowerCase();
 
 
 
-let color =
-white
-?
-"white"
-:
-"black";
 
 
+        const myData =
+        isWhite
+        ?
+        game.white
+        :
+        game.black;
 
 
 
-let data =
-white
-?
-game.white
-:
-game.black;
 
+        const opponent =
+        isWhite
+        ?
+        game.black.username
+        :
+        game.white.username;
 
 
-let opponent =
-white
-?
-game.black.username
-:
-game.white.username;
 
 
 
 
+        let accuracy = null;
 
-let accuracy =
-null;
 
 
+        if(game.accuracies){
 
-if(game.accuracies){
 
+            accuracy =
+            isWhite
+            ?
+            game.accuracies.white
+            :
+            game.accuracies.black;
 
-accuracy =
-white
-?
-game.accuracies.white
-:
-game.accuracies.black;
 
+        }
 
-}
 
 
 
 
 
+        db.push({
 
-db.push({
+            id:id,
 
-id:id,
+            player:player,
 
-date:
-new Date(
-game.end_time*1000
-)
-.toLocaleDateString(),
+            type:game.time_class,
 
+            date:
+            new Date(
+                game.end_time*1000
+            )
+            .toLocaleString(),
 
-opponent:opponent,
 
+            opponent:opponent,
 
-color:color,
 
+            result:
+            myData.result,
 
-result:data.result,
 
+            rating:
+            myData.rating
+            ||
+            null,
 
-rating:data.rating
-||null,
 
+            accuracy:accuracy
 
-accuracy:accuracy
 
+        });
 
-});
 
 
+    });
 
-});
 
 
 
-
-saveDatabase(db);
-
+    saveGamesDB(db);
 
 
 }
@@ -661,221 +604,143 @@ saveDatabase(db);
 
 
 // ======================================
-// DISPLAY STATS
+// CALCULATE STATS
 // ======================================
 
 
 function displayStats(player){
 
 
-let db =
-getDatabase();
+    let db =
+    getGamesDB();
 
 
 
 
-db =
-db.filter(g=>{
+    db =
+    db.filter(game=>
 
 
-return true;
+        game.player === player
 
+        &&
 
-});
+        game.type === gameType.value
 
 
+    );
 
 
-let wins=0;
 
-let losses=0;
 
-let draws=0;
 
+    let wins=0;
+    let losses=0;
+    let draws=0;
 
-let rating=0;
 
+    let accuracySum=0;
+    let accuracyCount=0;
 
 
-let accTotal=0;
 
-let accGames=0;
 
+    db.forEach(game=>{
 
 
+        if(game.result==="win"){
 
+            wins++;
 
-db.forEach(game=>{
+        }
+        else if(
 
+            game.result==="draw"
+            ||
+            game.result==="stalemate"
+            ||
+            game.result==="agreed"
 
-if(game.result==="win")
-wins++;
+        ){
 
+            draws++;
 
-else if(
-game.result==="stalemate"
-||
-game.result==="agreed"
-||
-game.result==="repetition"
-)
-draws++;
+        }
+        else{
 
+            losses++;
 
-else
-losses++;
+        }
 
 
 
 
+        if(
+            typeof game.accuracy
+            ===
+            "number"
+        ){
 
-if(game.accuracy!==null){
+            accuracySum +=
+            game.accuracy;
 
-accTotal +=
-game.accuracy;
 
-accGames++;
+            accuracyCount++;
 
-}
+        }
 
 
 
-});
+    });
 
 
 
 
 
 
-gamesEl.textContent =
-db.length;
+    gamesEl.textContent =
+    db.length;
 
 
 
-winsEl.textContent =
-wins;
+    winsEl.textContent =
+    wins;
 
 
 
-lossesEl.textContent =
-losses;
+    lossesEl.textContent =
+    losses;
 
 
 
-drawsEl.textContent =
-draws;
+    drawsEl.textContent =
+    draws;
 
 
 
-if(accGames>0){
 
+    accuracyEl.textContent =
 
-accuracyEl.textContent =
+    accuracyCount
 
-(
-accTotal/accGames
-)
-.toFixed(1)
-+
-"%";
+    ?
 
+    (
+        accuracySum /
+        accuracyCount
 
-}
-else{
+    )
+    .toFixed(1)
+    +"%"
 
+    :
 
-accuracyEl.textContent =
-"N/A";
+    "N/A";
 
 
-}
 
 
-
-
-
-
-renderTable(db);
-
-
-
-}
-
-
-
-
-
-
-
-
-// ======================================
-// TABLE
-// ======================================
-
-
-function renderTable(data){
-
-
-table.innerHTML="";
-
-
-
-data
-.slice()
-.reverse()
-.forEach(game=>{
-
-
-let row =
-document.createElement(
-"tr"
-);
-
-
-
-let resultClass =
-game.result==="win"
-?
-"win"
-:
-game.result==="loss"
-?
-"loss"
-:
-"draw";
-
-
-
-row.innerHTML = `
-
-
-<td>${game.date}</td>
-
-<td>${game.opponent}</td>
-
-<td class="${resultClass}">
-${game.result}
-</td>
-
-<td>
-${game.rating ?? "-"}
-</td>
-
-
-<td>
-${game.accuracy ?? "-"}
-</td>
-
-
-`;
-
-
-
-table.appendChild(row);
-
-
-
-});
+    renderHistory(db);
 
 
 }
@@ -889,21 +754,90 @@ table.appendChild(row);
 
 
 // ======================================
-// AUTO UPDATE
+// HISTORY TABLE
+// ======================================
+
+
+function renderHistory(db){
+
+
+    if(!gamesTable){
+
+        return;
+
+    }
+
+
+    gamesTable.innerHTML="";
+
+
+
+    db
+    .slice()
+    .reverse()
+    .forEach(game=>{
+
+
+        const row =
+        document.createElement("tr");
+
+
+
+        row.innerHTML = `
+
+        <td>${game.date}</td>
+
+        <td>${game.opponent}</td>
+
+        <td>${game.result}</td>
+
+        <td>${game.rating ?? "-"}</td>
+
+        <td>
+        ${
+            game.accuracy
+            ?
+            game.accuracy+"%"
+            :
+            "-"
+        }
+        </td>
+
+        `;
+
+
+
+        gamesTable.appendChild(row);
+
+
+
+    });
+
+
+
+}
+
+
+
+
+
+
+
+// ======================================
+// AUTO UPDATE 1 MIN
 // ======================================
 
 
 setInterval(()=>{
 
 
-if(
-playerInput.value.trim()!=""
-){
+    if(
+    playerInput.value.trim()
+    ){
 
-startUpdate();
+        updateDashboard();
 
-}
-
+    }
 
 
 },60000);
