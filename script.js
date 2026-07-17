@@ -1,304 +1,286 @@
-* {
-
-    box-sizing: border-box;
-
-    font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-
-}
+// ======================================
+// ELEMENTS
+// ======================================
 
 
+const playerInput =
+document.getElementById("player");
 
-body {
 
-    margin:0;
+const gameType =
+document.getElementById("gameType");
 
-    min-height:100vh;
 
-    background:#0f1115;
+const dateSelect =
+document.getElementById("date");
 
-    color:#e8e8e8;
 
-    display:flex;
+const customDate =
+document.getElementById("customDate");
 
-    justify-content:center;
 
-    align-items:flex-start;
-
-    padding:30px;
-
-}
+const searchBtn =
+document.getElementById("searchBtn");
 
 
 
-
-.container {
-
-    width:100%;
-
-    max-width:900px;
-
-}
+const gamesEl =
+document.getElementById("games");
 
 
+const winsEl =
+document.getElementById("wins");
+
+
+const lossesEl =
+document.getElementById("losses");
+
+
+const drawsEl =
+document.getElementById("draws");
+
+
+const ratingEl =
+document.getElementById("rating");
+
+
+const accuracyEl =
+document.getElementById("accuracy");
+
+
+const table =
+document.getElementById("gamesTable");
 
 
 
-h1 {
-
-    text-align:center;
-
-    margin-bottom:25px;
-
-    font-size:28px;
-
-    color:#ffffff;
-
-}
+const connection =
+document.getElementById("connection");
 
 
-
-
-
-.controls {
-
-    display:flex;
-
-    gap:10px;
-
-    flex-wrap:wrap;
-
-    justify-content:center;
-
-    margin-bottom:15px;
-
-}
+const lastUpdate =
+document.getElementById("lastUpdate");
 
 
 
 
-input,
-select,
-button {
+
+// ======================================
+// LOCAL STORAGE DATABASE
+// ======================================
 
 
-    background:#181c24;
+function getDatabase(){
 
-    color:#ffffff;
-
-    border:1px solid #303642;
-
-    border-radius:8px;
-
-    padding:10px 14px;
-
-    font-size:14px;
+    return JSON.parse(
+        localStorage.getItem("gamesDB")
+    ) || [];
 
 }
 
 
 
-input::placeholder {
+function saveDatabase(data){
 
-    color:#888;
-
-}
-
-
-
-button {
-
-    cursor:pointer;
-
-    background:#2563eb;
-
-    border:none;
-
-    transition:.2s;
-
-}
-
-
-
-button:hover {
-
-    background:#1d4ed8;
+    localStorage.setItem(
+        "gamesDB",
+        JSON.stringify(data)
+    );
 
 }
 
 
 
 
+// ======================================
+// SETTINGS LOAD
+// ======================================
+
+
+window.addEventListener(
+"load",
+()=>{
+
+
+playerInput.value =
+localStorage.getItem("player")
+|| "";
 
 
 
-.status {
+gameType.value =
+localStorage.getItem("type")
+|| "blitz";
 
 
-    display:flex;
 
-    justify-content:space-between;
+dateSelect.value =
+localStorage.getItem("date")
+|| "today";
 
-    margin:15px 0;
 
-    color:#999;
 
-    font-size:13px;
+});
+
+
+
+
+
+
+// ======================================
+// SETTINGS SAVE
+// ======================================
+
+
+playerInput.addEventListener(
+"change",
+()=>{
+
+localStorage.setItem(
+"player",
+playerInput.value
+);
+
+});
+
+
+
+gameType.addEventListener(
+"change",
+()=>{
+
+localStorage.setItem(
+"type",
+gameType.value
+);
+
+});
+
+
+
+dateSelect.addEventListener(
+"change",
+()=>{
+
+
+localStorage.setItem(
+"date",
+dateSelect.value
+);
+
+
+
+customDate.style.display =
+dateSelect.value==="custom"
+?
+"block"
+:
+"none";
+
+
+
+});
+
+
+
+
+
+// ======================================
+// UPDATE BUTTON
+// ======================================
+
+
+searchBtn.addEventListener(
+"click",
+()=>{
+
+startUpdate();
+
+});
+
+
+
+
+
+
+// ======================================
+// MAIN UPDATE
+// ======================================
+
+
+async function startUpdate(){
+
+
+
+const player =
+playerInput.value
+.trim()
+.toLowerCase();
+
+
+
+if(!player){
+
+return;
 
 }
 
 
 
 
+try{
 
-.dashboard {
 
-
-    display:grid;
-
-    grid-template-columns:
-    repeat(3,1fr);
-
-    gap:15px;
-
-}
+await fetchGames(
+player
+);
 
 
 
+connection.innerHTML =
+"● Connected";
 
 
-.card {
+
+connection.style.color =
+"#22c55e";
 
 
-    width:100%;
 
-    aspect-ratio:1/1;
+lastUpdate.textContent =
+"Updated: "
++
+new Date()
+.toLocaleTimeString();
 
-    background:#171a21;
-
-    border:1px solid #262b35;
-
-    border-radius:15px;
-
-
-    display:flex;
-
-    flex-direction:column;
-
-    justify-content:center;
-
-    align-items:center;
 
 
 }
+catch(error){
 
 
 
-
-
-.card h3 {
-
-
-    margin:0 0 15px;
-
-    font-size:14px;
-
-    color:#9ca3af;
-
-    font-weight:500;
-
-}
+console.log(error);
 
 
 
+connection.innerHTML =
+"● Offline cache";
 
-.card strong {
 
-
-    font-size:36px;
-
-    color:#ffffff;
-
-}
+connection.style.color =
+"#eab308";
 
 
 
+displayStats(
+player
+);
 
-
-
-.games-list {
-
-
-    margin-top:30px;
-
-
-    background:#171a21;
-
-    padding:20px;
-
-    border-radius:15px;
-
-    border:1px solid #262b35;
 
 
 }
 
 
-
-
-
-.games-list h2 {
-
-    margin-top:0;
-
-    font-size:20px;
-
-}
-
-
-
-
-
-table {
-
-
-    width:100%;
-
-    border-collapse:collapse;
-
-}
-
-
-
-
-th {
-
-
-    text-align:left;
-
-    color:#9ca3af;
-
-    font-size:13px;
-
-    padding:10px;
-
-    border-bottom:1px solid #303642;
-
-}
-
-
-
-
-td {
-
-
-    padding:10px;
-
-    border-bottom:1px solid #242936;
-
-    font-size:14px;
 
 }
 
@@ -307,40 +289,29 @@ td {
 
 
 
-.win {
-
-    color:#22c55e;
-
-}
 
 
-.loss {
-
-    color:#ef4444;
-
-}
+// ======================================
+// FETCH CHESS.COM GAMES
+// ======================================
 
 
-.draw {
+async function fetchGames(player){
 
-    color:#eab308;
 
-}
+
+let target =
+new Date();
 
 
 
 
+if(dateSelect.value==="yesterday"){
 
 
-@media(max-width:700px){
-
-
-    .dashboard {
-
-        grid-template-columns:
-        repeat(2,1fr);
-
-    }
+target.setDate(
+target.getDate()-1
+);
 
 
 }
@@ -349,23 +320,590 @@ td {
 
 
 
-@media(max-width:450px){
+if(dateSelect.value==="custom"){
 
 
-    body {
-
-        padding:15px;
-
-    }
-
-
-
-    .dashboard {
-
-        grid-template-columns:
-        1fr;
-
-    }
+target =
+new Date(
+customDate.value
+);
 
 
 }
+
+
+
+
+
+let startTime =
+0;
+
+
+
+if(dateSelect.value==="session"){
+
+
+startTime =
+Number(
+localStorage.getItem(
+"sessionStart"
+)
+);
+
+
+target =
+new Date(
+startTime
+);
+
+
+}
+
+
+
+
+const year =
+target.getFullYear();
+
+
+
+const month =
+String(
+target.getMonth()+1
+)
+.padStart(2,"0");
+
+
+
+
+
+const url =
+
+`https://api.chess.com/pub/player/${player}/games/${year}/${month}`;
+
+
+
+
+
+const response =
+await fetch(url);
+
+
+
+if(!response.ok){
+
+throw new Error(
+"API error"
+);
+
+}
+
+
+
+
+
+const data =
+await response.json();
+
+
+
+let games =
+data.games || [];
+
+
+
+
+
+
+games =
+games.filter(game=>{
+
+
+const time =
+game.end_time*1000;
+
+
+
+if(dateSelect.value==="session"){
+
+
+return time > startTime;
+
+
+}
+
+
+
+
+const d =
+new Date(time);
+
+
+
+return (
+
+d.getDate()
+===
+target.getDate()
+
+&&
+
+d.getMonth()
+===
+target.getMonth()
+
+&&
+
+d.getFullYear()
+===
+target.getFullYear()
+
+);
+
+
+});
+
+
+
+
+
+games =
+games.filter(game=>
+
+game.time_class
+===
+gameType.value
+
+);
+
+
+
+
+
+saveGames(
+games,
+player
+);
+
+
+
+
+
+displayStats(
+player
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+// ======================================
+// SAVE NEW GAMES
+// ======================================
+
+
+function saveGames(
+games,
+player
+){
+
+
+let db =
+getDatabase();
+
+
+
+
+games.forEach(game=>{
+
+
+const id =
+game.url
+||
+game.end_time;
+
+
+
+const exists =
+db.find(
+g=>g.id===id
+);
+
+
+
+if(exists){
+
+return;
+
+}
+
+
+
+
+
+let white =
+game.white.username
+.toLowerCase()
+===
+player;
+
+
+
+let color =
+white
+?
+"white"
+:
+"black";
+
+
+
+
+
+let data =
+white
+?
+game.white
+:
+game.black;
+
+
+
+let opponent =
+white
+?
+game.black.username
+:
+game.white.username;
+
+
+
+
+
+let accuracy =
+null;
+
+
+
+if(game.accuracies){
+
+
+accuracy =
+white
+?
+game.accuracies.white
+:
+game.accuracies.black;
+
+
+}
+
+
+
+
+
+
+db.push({
+
+id:id,
+
+date:
+new Date(
+game.end_time*1000
+)
+.toLocaleDateString(),
+
+
+opponent:opponent,
+
+
+color:color,
+
+
+result:data.result,
+
+
+rating:data.rating
+||null,
+
+
+accuracy:accuracy
+
+
+});
+
+
+
+});
+
+
+
+
+saveDatabase(db);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ======================================
+// DISPLAY STATS
+// ======================================
+
+
+function displayStats(player){
+
+
+let db =
+getDatabase();
+
+
+
+
+db =
+db.filter(g=>{
+
+
+return true;
+
+
+});
+
+
+
+
+let wins=0;
+
+let losses=0;
+
+let draws=0;
+
+
+let rating=0;
+
+
+
+let accTotal=0;
+
+let accGames=0;
+
+
+
+
+
+db.forEach(game=>{
+
+
+if(game.result==="win")
+wins++;
+
+
+else if(
+game.result==="stalemate"
+||
+game.result==="agreed"
+||
+game.result==="repetition"
+)
+draws++;
+
+
+else
+losses++;
+
+
+
+
+
+if(game.accuracy!==null){
+
+accTotal +=
+game.accuracy;
+
+accGames++;
+
+}
+
+
+
+});
+
+
+
+
+
+
+gamesEl.textContent =
+db.length;
+
+
+
+winsEl.textContent =
+wins;
+
+
+
+lossesEl.textContent =
+losses;
+
+
+
+drawsEl.textContent =
+draws;
+
+
+
+if(accGames>0){
+
+
+accuracyEl.textContent =
+
+(
+accTotal/accGames
+)
+.toFixed(1)
++
+"%";
+
+
+}
+else{
+
+
+accuracyEl.textContent =
+"N/A";
+
+
+}
+
+
+
+
+
+
+renderTable(db);
+
+
+
+}
+
+
+
+
+
+
+
+
+// ======================================
+// TABLE
+// ======================================
+
+
+function renderTable(data){
+
+
+table.innerHTML="";
+
+
+
+data
+.slice()
+.reverse()
+.forEach(game=>{
+
+
+let row =
+document.createElement(
+"tr"
+);
+
+
+
+let resultClass =
+game.result==="win"
+?
+"win"
+:
+game.result==="loss"
+?
+"loss"
+:
+"draw";
+
+
+
+row.innerHTML = `
+
+
+<td>${game.date}</td>
+
+<td>${game.opponent}</td>
+
+<td class="${resultClass}">
+${game.result}
+</td>
+
+<td>
+${game.rating ?? "-"}
+</td>
+
+
+<td>
+${game.accuracy ?? "-"}
+</td>
+
+
+`;
+
+
+
+table.appendChild(row);
+
+
+
+});
+
+
+}
+
+
+
+
+
+
+
+
+
+// ======================================
+// AUTO UPDATE
+// ======================================
+
+
+setInterval(()=>{
+
+
+if(
+playerInput.value.trim()!=""
+){
+
+startUpdate();
+
+}
+
+
+
+},60000);
