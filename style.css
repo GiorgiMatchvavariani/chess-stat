@@ -1,44 +1,26 @@
-* {
-
-    box-sizing: border-box;
-
-    font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-
+*{
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
 }
 
 
-
-body {
+body{
 
     margin:0;
 
+    background:#0b0d10;
+
+    color:white;
+
     min-height:100vh;
-
-    background:#0f1115;
-
-    color:#e8e8e8;
 
     display:flex;
 
-    justify-content:center;
+    flex-direction:column;
 
-    align-items:flex-start;
+    align-items:center;
 
-    padding:30px;
-
-}
-
-
-
-
-.container {
-
-    width:100%;
-
-    max-width:900px;
+    padding:20px;
 
 }
 
@@ -46,15 +28,33 @@ body {
 
 
 
-h1 {
+/* MAIN DASHBOARD */
+
+.container{
+
+    width:400px;
+
+    height:400px;
+
+    background:#11151b;
+
+    border-radius:15px;
+
+    padding:15px;
+
+}
+
+
+
+
+
+h1{
 
     text-align:center;
 
-    margin-bottom:25px;
+    font-size:20px;
 
-    font-size:28px;
-
-    color:#ffffff;
+    margin:0 0 10px;
 
 }
 
@@ -62,70 +62,46 @@ h1 {
 
 
 
-.controls {
+.controls{
 
-    display:flex;
+    display:grid;
 
-    gap:10px;
+    grid-template-columns:1fr 1fr;
 
-    flex-wrap:wrap;
-
-    justify-content:center;
-
-    margin-bottom:15px;
+    gap:5px;
 
 }
+
 
 
 
 
 input,
 select,
-button {
+button{
 
+    height:30px;
 
-    background:#181c24;
+    background:#1b212b;
 
-    color:#ffffff;
+    color:white;
 
-    border:1px solid #303642;
+    border:1px solid #333;
 
-    border-radius:8px;
+    border-radius:6px;
 
-    padding:10px 14px;
-
-    font-size:14px;
-
-}
-
-
-
-input::placeholder {
-
-    color:#888;
+    font-size:12px;
 
 }
 
 
 
-button {
-
-    cursor:pointer;
+button{
 
     background:#2563eb;
 
     border:none;
 
-    transition:.2s;
-
-}
-
-
-
-button:hover {
-
-    background:#1d4ed8;
-
 }
 
 
@@ -133,19 +109,15 @@ button:hover {
 
 
 
+.status{
 
-.status {
-
+    margin:8px 0;
 
     display:flex;
 
     justify-content:space-between;
 
-    margin:15px 0;
-
-    color:#999;
-
-    font-size:13px;
+    font-size:11px;
 
 }
 
@@ -153,15 +125,16 @@ button:hover {
 
 
 
-.dashboard {
 
+
+.dashboard{
 
     display:grid;
 
     grid-template-columns:
     repeat(3,1fr);
 
-    gap:15px;
+    gap:8px;
 
 }
 
@@ -169,19 +142,14 @@ button:hover {
 
 
 
-.card {
 
+.card{
 
-    width:100%;
+    height:90px;
 
-    aspect-ratio:1/1;
+    background:#181d26;
 
-    background:#171a21;
-
-    border:1px solid #262b35;
-
-    border-radius:15px;
-
+    border-radius:10px;
 
     display:flex;
 
@@ -191,57 +159,53 @@ button:hover {
 
     align-items:center;
 
-
 }
 
 
 
+.card h3{
 
+    margin:0;
 
-.card h3 {
-
-
-    margin:0 0 15px;
-
-    font-size:14px;
+    font-size:11px;
 
     color:#9ca3af;
 
-    font-weight:500;
+}
+
+
+
+.card strong{
+
+    margin-top:5px;
+
+    font-size:24px;
 
 }
 
 
 
 
-.card strong {
-
-
-    font-size:36px;
-
-    color:#ffffff;
-
-}
 
 
 
 
 
+/* HISTORY SECTION */
 
-.games-list {
-
-
-    margin-top:30px;
+.history{
 
 
-    background:#171a21;
+    width:600px;
 
-    padding:20px;
+    margin-top:20px;
+
+    background:#11151b;
+
+    padding:15px;
 
     border-radius:15px;
 
-    border:1px solid #262b35;
-
 
 }
 
@@ -249,11 +213,11 @@ button:hover {
 
 
 
-.games-list h2 {
+.history h2{
 
-    margin-top:0;
+    margin:0 0 10px;
 
-    font-size:20px;
+    font-size:16px;
 
 }
 
@@ -261,69 +225,42 @@ button:hover {
 
 
 
-table {
-
+table{
 
     width:100%;
 
     border-collapse:collapse;
 
+    font-size:12px;
+
 }
 
 
 
-
-th {
-
-
-    text-align:left;
+th{
 
     color:#9ca3af;
 
-    font-size:13px;
+}
 
-    padding:10px;
 
-    border-bottom:1px solid #303642;
+
+td,
+th{
+
+    padding:6px;
+
+    text-align:center;
 
 }
 
 
 
+tbody{
 
-td {
+    max-height:300px;
 
-
-    padding:10px;
-
-    border-bottom:1px solid #242936;
-
-    font-size:14px;
-
-}
-
-
-
-
-
-
-.win {
-
-    color:#22c55e;
-
-}
-
-
-.loss {
-
-    color:#ef4444;
-
-}
-
-
-.draw {
-
-    color:#eab308;
+    overflow:auto;
 
 }
 
@@ -331,41 +268,29 @@ td {
 
 
 
-
-@media(max-width:700px){
-
-
-    .dashboard {
-
-        grid-template-columns:
-        repeat(2,1fr);
-
-    }
+.win{
+color:#22c55e;
+}
 
 
+.loss{
+color:#ef4444;
+}
+
+
+.draw{
+color:#eab308;
 }
 
 
 
 
+@media(max-width:650px){
 
-@media(max-width:450px){
+.history{
 
+    width:400px;
 
-    body {
-
-        padding:15px;
-
-    }
-
-
-
-    .dashboard {
-
-        grid-template-columns:
-        1fr;
-
-    }
-
+}
 
 }
