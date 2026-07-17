@@ -22,31 +22,116 @@ const ratingEl = document.getElementById("rating");
 
 
 // ================================
-// LOAD SAVED PLAYER
+// LOCAL STORAGE HELPERS
 // ================================
 
-playerInput.value =
-localStorage.getItem("chessPlayer") || "";
+function saveCache(key, data){
+
+    localStorage.setItem(
+        key,
+        JSON.stringify(data)
+    );
+
+}
 
 
 
-// ================================
-// CUSTOM DATE DISPLAY
-// ================================
+function getCache(key){
 
-dateSelect.addEventListener("change", ()=>{
+    const data =
+    localStorage.getItem(key);
 
-    if(dateSelect.value === "custom"){
 
-        customDate.style.display = "block";
+    if(data === null){
 
-    }else{
-
-        customDate.style.display = "none";
+        return null;
 
     }
 
+
+    return JSON.parse(data);
+
+}
+
+
+
+// ================================
+// LOAD SAVED SETTINGS
+// ================================
+
+window.addEventListener("load", ()=>{
+
+
+    playerInput.value =
+    localStorage.getItem("player")
+    || "";
+
+
+    gameType.value =
+    localStorage.getItem("gameType")
+    || "blitz";
+
+
+    dateSelect.value =
+    localStorage.getItem("date")
+    || "today";
+
+
 });
+
+
+
+
+// ================================
+// SAVE SETTINGS
+// ================================
+
+playerInput.addEventListener(
+"change",
+()=>{
+
+    localStorage.setItem(
+        "player",
+        playerInput.value
+    );
+
+});
+
+
+
+gameType.addEventListener(
+"change",
+()=>{
+
+    localStorage.setItem(
+        "gameType",
+        gameType.value
+    );
+
+});
+
+
+
+dateSelect.addEventListener(
+"change",
+()=>{
+
+    localStorage.setItem(
+        "date",
+        dateSelect.value
+    );
+
+
+    customDate.style.display =
+    dateSelect.value === "custom"
+    ?
+    "block"
+    :
+    "none";
+
+
+});
+
 
 
 
@@ -61,8 +146,9 @@ loadGames
 
 
 
+
 // ================================
-// MAIN FUNCTION
+// MAIN API FUNCTION
 // ================================
 
 async function loadGames(){
@@ -86,48 +172,14 @@ async function loadGames(){
 
 
     localStorage.setItem(
-        "chessPlayer",
+        "player",
         player
     );
 
 
 
-    let targetDate = new Date();
-
-
-// LIVE SESSION
-
-if(dateSelect.value === "session"){
-
-
-    let savedStart =
-    localStorage.getItem(
-        "sessionStart"
-    );
-
-
-    if(!savedStart){
-
-        savedStart =
-        Date.now();
-
-
-        localStorage.setItem(
-            "sessionStart",
-            savedStart
-        );
-
-    }
-
-
-}
-else{
-
-    localStorage.removeItem(
-        "sessionStart"
-    );
-
-}
+    let targetDate =
+    new Date();
 
 
 
@@ -136,27 +188,48 @@ else{
     if(dateSelect.value === "yesterday"){
 
         targetDate.setDate(
-            targetDate.getDate() - 1
+            targetDate.getDate()-1
         );
 
     }
 
 
 
-    // Custom date
+    // Custom
 
     if(dateSelect.value === "custom"){
 
-        if(!customDate.value){
 
-            alert("Select date");
+        targetDate =
+        new Date(
+            customDate.value
+        );
 
-            return;
+
+    }
+
+
+
+    // Session mode
+
+    if(
+        dateSelect.value === "session"
+    ){
+
+
+        if(
+            !localStorage.getItem(
+                "sessionStart"
+            )
+        ){
+
+            localStorage.setItem(
+                "sessionStart",
+                Date.now()
+            );
 
         }
 
-        targetDate =
-        new Date(customDate.value);
 
     }
 
@@ -175,16 +248,15 @@ else{
 
 
 
-    const url =
-    `https://api.chess.com/pub/player/${player}/games/${year}/${month}`;
-
-
-
     try{
 
 
         const response =
-        await fetch(url);
+        await fetch(
+
+        `https://api.chess.com/pub/player/${player}/games/${year}/${month}`
+
+        );
 
 
 
@@ -208,84 +280,71 @@ else{
 
 
 
-        // Filter by selected date
 
-        games =
-games.filter(game=>{
-
-
-    const gameDate =
-    new Date(
-        game.end_time * 1000
-    );
-
-
-
-    // FROM NOW MODE
-
-    if(
-        dateSelect.value === "session"
-    ){
-
-        const start =
-        Number(
-            localStorage.getItem(
-                "sessionStart"
-            )
-        );
-
-
-        return (
-            game.end_time * 1000
-            >
-            start
-        );
-
-    }
-
-
-
-    // NORMAL DATE FILTER
-
-    return (
-
-        gameDate.getDate()
-        ===
-        targetDate.getDate()
-
-
-        &&
-
-
-        gameDate.getMonth()
-        ===
-        targetDate.getMonth()
-
-
-        &&
-
-
-        gameDate.getFullYear()
-        ===
-        targetDate.getFullYear()
-
-    );
-
-
-});
-
-
-
-        // Filter game type
 
         games =
         games.filter(game=>{
 
 
+            const gameDate =
+            new Date(
+                game.end_time * 1000
+            );
+
+
+
+            // SESSION FILTER
+
+            if(
+                dateSelect.value === "session"
+            ){
+
+
+                const start =
+                Number(
+                    localStorage.getItem(
+                        "sessionStart"
+                    )
+                );
+
+
+                return (
+
+                    game.end_time * 1000
+                    >
+                    start
+
+                );
+
+            }
+
+
+
+
+            // DATE FILTER
+
             return (
-                game.time_class
+
+                gameDate.getDate()
                 ===
-                gameType.value
+                targetDate.getDate()
+
+
+                &&
+
+
+                gameDate.getMonth()
+                ===
+                targetDate.getMonth()
+
+
+                &&
+
+
+                gameDate.getFullYear()
+                ===
+                targetDate.getFullYear()
+
             );
 
 
@@ -293,9 +352,35 @@ games.filter(game=>{
 
 
 
+
+
+        // TIME CONTROL FILTER
+
+        games =
+        games.filter(game=>
+
+            game.time_class
+            ===
+            gameType.value
+
+        );
+
+
+
+
+        const previousRating =
+        await getPreviousDayRating(
+            player,
+            targetDate,
+            gameType.value
+        );
+
+
+
         calculateStats(
             games,
-            player
+            player,
+            previousRating
         );
 
 
@@ -320,90 +405,253 @@ games.filter(game=>{
 
 
 
+
+
 // ================================
-// CALCULATE STATS
+// GET PREVIOUS DAY RATING
+// ================================
+
+async function getPreviousDayRating(
+    player,
+    date,
+    type
+){
+
+
+    const key =
+    `rating_${player}_${date.toISOString().slice(0,10)}_${type}`;
+
+
+
+    const cached =
+    localStorage.getItem(key);
+
+
+
+    if(cached !== null){
+
+        return JSON.parse(cached);
+
+    }
+
+
+
+
+    const previous =
+    new Date(date);
+
+
+
+    previous.setDate(
+        previous.getDate()-1
+    );
+
+
+
+    const year =
+    previous.getFullYear();
+
+
+    const month =
+    String(
+        previous.getMonth()+1
+    )
+    .padStart(2,"0");
+
+
+
+
+    const response =
+    await fetch(
+
+    `https://api.chess.com/pub/player/${player}/games/${year}/${month}`
+
+    );
+
+
+
+    const data =
+    await response.json();
+
+
+
+    let games =
+    data.games || [];
+
+
+
+    games =
+    games.filter(game=>{
+
+
+        const d =
+        new Date(
+            game.end_time*1000
+        );
+
+
+
+        return (
+
+            d.getDate()
+            ===
+            previous.getDate()
+
+            &&
+
+            d.getMonth()
+            ===
+            previous.getMonth()
+
+            &&
+
+            d.getFullYear()
+            ===
+            previous.getFullYear()
+
+            &&
+
+            game.time_class
+            ===
+            type
+
+        );
+
+
+    });
+
+
+
+
+    if(games.length===0){
+
+        return null;
+
+    }
+
+
+
+    games.sort(
+        (a,b)=>
+        a.end_time-b.end_time
+    );
+
+
+
+    const last =
+    games[games.length-1];
+
+
+
+    let rating;
+
+
+
+    if(
+        last.white.username
+        .toLowerCase()
+        ===
+        player
+    ){
+
+        rating =
+        last.white.rating;
+
+
+    }else{
+
+
+        rating =
+        last.black.rating;
+
+
+    }
+
+
+
+
+    localStorage.setItem(
+        key,
+        JSON.stringify(rating)
+    );
+
+
+
+    return rating;
+
+}
+
+
+
+
+
+
+
+// ================================
+// CALCULATE
 // ================================
 
 function calculateStats(
     games,
-    player
+    player,
+    startingRating
 ){
 
 
-    let wins = 0;
+    let wins=0;
 
-    let losses = 0;
+    let losses=0;
 
-    let draws = 0;
-
-
-    let ratingChange = 0;
-
-    let previousRating = null;
+    let draws=0;
 
 
+    let ratingChange=0;
 
-    // Oldest -> newest
+
+    let previousRating =
+    startingRating;
+
+
 
     games.sort(
         (a,b)=>
-        a.end_time - b.end_time
+        a.end_time-b.end_time
     );
+
 
 
 
     games.forEach(game=>{
 
 
-        let playerData = null;
+        let data;
 
 
 
-        const white =
-        game.white?.username
-        ?.toLowerCase();
+        if(
+        game.white.username
+        .toLowerCase()
+        ===
+        player
+        ){
 
-
-
-        const black =
-        game.black?.username
-        ?.toLowerCase();
-
-
-
-
-        if(white === player){
-
-
-            playerData =
+            data =
             game.white;
 
 
-        }
-
-        else if(black === player){
+        }else{
 
 
-            playerData =
+            data =
             game.black;
 
 
         }
 
-        else{
-
-            return;
-
-        }
 
 
 
-
-        // RESULT
-
-        switch(
-            playerData.result
-        ){
+        switch(data.result){
 
 
             case "win":
@@ -415,17 +663,11 @@ function calculateStats(
 
 
             case "stalemate":
-
             case "repetition":
-
             case "agreed":
-
             case "insufficient":
-
             case "50move":
-
             case "timevsinsufficient":
-
 
                 draws++;
 
@@ -442,32 +684,30 @@ function calculateStats(
 
 
 
-
-        // RATING CHANGE
-
-        if(playerData.rating){
-
-
-
-            if(previousRating !== null){
+        if(
+        data.rating
+        &&
+        previousRating !== null
+        ){
 
 
-                ratingChange +=
-                playerData.rating
-                -
-                previousRating;
+            ratingChange +=
+            data.rating
+            -
+            previousRating;
 
-
-            }
-
-
-
-            previousRating =
-            playerData.rating;
 
 
         }
 
+
+
+        if(data.rating){
+
+            previousRating =
+            data.rating;
+
+        }
 
 
     });
@@ -475,22 +715,17 @@ function calculateStats(
 
 
 
-    // UPDATE UI
-
 
     gamesEl.textContent =
     games.length;
-
 
 
     winsEl.textContent =
     wins;
 
 
-
     lossesEl.textContent =
     losses;
-
 
 
     drawsEl.textContent =
@@ -501,34 +736,27 @@ function calculateStats(
     ratingEl.textContent =
     ratingChange >= 0
     ?
-    "+" + ratingChange
+    "+"+ratingChange
     :
     ratingChange;
 
 
 
-    ratingEl.style.color =
-    ratingChange >= 0
-    ?
-    "#32d74b"
-    :
-    "#ff453a";
-
 }
 
 
 
+
 // ================================
-// AUTO REFRESH EVERY 3 MINUTES
+// AUTO UPDATE EVERY 1 MINUTE
 // ================================
 
 setInterval(()=>{
 
 
     if(
-        playerInput.value.trim()
-        !==
-        ""
+    playerInput.value.trim()
+    !== ""
     ){
 
         loadGames();
@@ -536,4 +764,4 @@ setInterval(()=>{
     }
 
 
-},180000);
+},60000);
