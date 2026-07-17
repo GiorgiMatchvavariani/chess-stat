@@ -550,7 +550,7 @@ return;
 
 let white =
 game.white.username
-.toLowerCase()
+
 ===
 player;
 
