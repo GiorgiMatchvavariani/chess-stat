@@ -214,7 +214,7 @@ async function startUpdate(){
 const player =
 playerInput.value
 .trim()
-.toLowerCase();
+
 
 
 
