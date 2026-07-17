@@ -1,67 +1,60 @@
-*{
+* {
 
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+    box-sizing: border-box;
 
     font-family:
-    Inter,
     Arial,
+    Helvetica,
     sans-serif;
 
 }
 
 
 
-body{
+body {
+
+    margin:0;
 
     min-height:100vh;
 
-    background:#0f1117;
+    background:#0f1115;
 
-    color:white;
+    color:#e8e8e8;
 
     display:flex;
 
     justify-content:center;
 
-    padding:40px;
+    align-items:flex-start;
+
+    padding:30px;
 
 }
 
 
 
-.container{
+
+.container {
 
     width:100%;
 
-    max-width:700px;
+    max-width:900px;
 
 }
 
 
 
-header{
+
+
+h1 {
 
     text-align:center;
 
-    margin-bottom:30px;
+    margin-bottom:25px;
 
-}
+    font-size:28px;
 
-
-header h1{
-
-    font-size:34px;
-
-}
-
-
-header p{
-
-    color:#8b93a7;
-
-    margin-top:8px;
+    color:#ffffff;
 
 }
 
@@ -69,87 +62,196 @@ header p{
 
 
 
-.stats{
+.controls {
 
     display:flex;
 
+    gap:10px;
+
+    flex-wrap:wrap;
+
     justify-content:center;
 
-    margin-bottom:30px;
+    margin-bottom:15px;
 
 }
 
 
 
-.card{
 
-    width:300px;
-
-    height:300px;
-
-    background:#1a1f2b;
-
-    border:
-
-    1px solid #303746;
+input,
+select,
+button {
 
 
-    border-radius:20px;
+    background:#181c24;
 
-    padding:25px;
+    color:#ffffff;
 
+    border:1px solid #303642;
 
-    box-shadow:
+    border-radius:8px;
 
-    0 15px 40px rgba(0,0,0,.4);
+    padding:10px 14px;
+
+    font-size:14px;
 
 }
 
 
 
-.card-title{
+input::placeholder {
 
-    font-size:20px;
-
-    font-weight:700;
-
-    margin-bottom:20px;
+    color:#888;
 
 }
 
 
 
-.stat{
+button {
+
+    cursor:pointer;
+
+    background:#2563eb;
+
+    border:none;
+
+    transition:.2s;
+
+}
+
+
+
+button:hover {
+
+    background:#1d4ed8;
+
+}
+
+
+
+
+
+
+
+.status {
+
 
     display:flex;
 
     justify-content:space-between;
 
-    padding:10px 0;
+    margin:15px 0;
 
-    border-bottom:
+    color:#999;
 
-    1px solid #303746;
+    font-size:13px;
+
+}
+
+
+
+
+
+.dashboard {
+
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(3,1fr);
+
+    gap:15px;
 
 }
 
 
 
-.stat:last-child{
 
-    border:none;
+
+.card {
+
+
+    width:100%;
+
+    aspect-ratio:1/1;
+
+    background:#171a21;
+
+    border:1px solid #262b35;
+
+    border-radius:15px;
+
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
 
 }
 
 
-.stat span{
+
+
+
+.card h3 {
+
+
+    margin:0 0 15px;
+
+    font-size:14px;
 
     color:#9ca3af;
 
+    font-weight:500;
+
 }
 
 
-.stat strong{
+
+
+.card strong {
+
+
+    font-size:36px;
+
+    color:#ffffff;
+
+}
+
+
+
+
+
+
+.games-list {
+
+
+    margin-top:30px;
+
+
+    background:#171a21;
+
+    padding:20px;
+
+    border-radius:15px;
+
+    border:1px solid #262b35;
+
+
+}
+
+
+
+
+
+.games-list h2 {
+
+    margin-top:0;
 
     font-size:20px;
 
@@ -158,84 +260,45 @@ header p{
 
 
 
-.form{
 
-    background:#1a1f2b;
-
-    border:
-
-    1px solid #303746;
+table {
 
 
-    border-radius:20px;
+    width:100%;
 
-    padding:30px;
-
+    border-collapse:collapse;
 
 }
 
 
 
-.form h2{
 
-    margin-bottom:20px;
-
-}
+th {
 
 
-
-label{
-
-    display:block;
-
-    margin-top:15px;
-
-    margin-bottom:7px;
+    text-align:left;
 
     color:#9ca3af;
 
-}
+    font-size:13px;
 
+    padding:10px;
 
-
-input,
-select{
-
-
-    width:100%;
-
-
-    padding:12px;
-
-
-    background:#10141d;
-
-
-    color:white;
-
-
-    border:
-
-    1px solid #303746;
-
-
-    border-radius:10px;
-
-
-    font-size:15px;
+    border-bottom:1px solid #303642;
 
 }
 
 
 
 
-input:focus,
-select:focus{
+td {
 
 
-    outline:none;
+    padding:10px;
 
-    border-color:#4f8cff;
+    border-bottom:1px solid #242936;
+
+    font-size:14px;
 
 }
 
@@ -243,43 +306,66 @@ select:focus{
 
 
 
-button{
+
+.win {
+
+    color:#22c55e;
+
+}
 
 
-    margin-top:25px;
+.loss {
+
+    color:#ef4444;
+
+}
 
 
-    width:100%;
+.draw {
 
-
-    padding:14px;
-
-
-    border:none;
-
-
-    border-radius:10px;
-
-
-    background:#4f8cff;
-
-
-    color:white;
-
-
-    font-size:16px;
-
-
-    cursor:pointer;
+    color:#eab308;
 
 }
 
 
 
-button:hover{
 
 
-    background:#326ed8;
+
+@media(max-width:700px){
+
+
+    .dashboard {
+
+        grid-template-columns:
+        repeat(2,1fr);
+
+    }
+
+
+}
+
+
+
+
+
+@media(max-width:450px){
+
+
+    body {
+
+        padding:15px;
+
+    }
+
+
+
+    .dashboard {
+
+        grid-template-columns:
+        1fr;
+
+    }
 
 
 }
