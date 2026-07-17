@@ -3,15 +3,11 @@
 // ================================
 
 const playerInput = document.getElementById("player");
-
 const dateSelect = document.getElementById("date");
-
 const customDate = document.getElementById("customDate");
-
 const gameType = document.getElementById("gameType");
 
 const searchBtn = document.getElementById("searchBtn");
-
 
 const gamesEl = document.getElementById("games");
 const winsEl = document.getElementById("wins");
@@ -22,63 +18,22 @@ const ratingEl = document.getElementById("rating");
 
 
 // ================================
-// LOCAL STORAGE HELPERS
-// ================================
-
-function saveCache(key, data){
-
-    localStorage.setItem(
-        key,
-        JSON.stringify(data)
-    );
-
-}
-
-
-
-function getCache(key){
-
-    const data =
-    localStorage.getItem(key);
-
-
-    if(data === null){
-
-        return null;
-
-    }
-
-
-    return JSON.parse(data);
-
-}
-
-
-
-// ================================
-// LOAD SAVED SETTINGS
+// LOAD SETTINGS
 // ================================
 
 window.addEventListener("load", ()=>{
 
-
     playerInput.value =
-    localStorage.getItem("player")
-    || "";
-
+    localStorage.getItem("player") || "";
 
     gameType.value =
-    localStorage.getItem("gameType")
-    || "blitz";
-
+    localStorage.getItem("gameType") || "blitz";
 
     dateSelect.value =
-    localStorage.getItem("date")
-    || "today";
+    localStorage.getItem("date") || "today";
 
 
 });
-
 
 
 
@@ -86,9 +41,7 @@ window.addEventListener("load", ()=>{
 // SAVE SETTINGS
 // ================================
 
-playerInput.addEventListener(
-"change",
-()=>{
+playerInput.addEventListener("change", ()=>{
 
     localStorage.setItem(
         "player",
@@ -98,10 +51,7 @@ playerInput.addEventListener(
 });
 
 
-
-gameType.addEventListener(
-"change",
-()=>{
+gameType.addEventListener("change", ()=>{
 
     localStorage.setItem(
         "gameType",
@@ -111,10 +61,7 @@ gameType.addEventListener(
 });
 
 
-
-dateSelect.addEventListener(
-"change",
-()=>{
+dateSelect.addEventListener("change", ()=>{
 
     localStorage.setItem(
         "date",
@@ -129,9 +76,7 @@ dateSelect.addEventListener(
     :
     "none";
 
-
 });
-
 
 
 
@@ -146,9 +91,8 @@ loadGames
 
 
 
-
 // ================================
-// MAIN API FUNCTION
+// MAIN
 // ================================
 
 async function loadGames(){
@@ -164,7 +108,6 @@ async function loadGames(){
     if(!player){
 
         alert("Enter player name");
-
         return;
 
     }
@@ -178,226 +121,104 @@ async function loadGames(){
 
 
 
-    let targetDate =
-    new Date();
+    // SESSION MODE
 
+    if(dateSelect.value === "session"){
 
-
-    // Yesterday
-
-    if(dateSelect.value === "yesterday"){
-
-        targetDate.setDate(
-            targetDate.getDate()-1
+        await startSession(
+            player
         );
 
     }
 
 
 
-    // Custom
+    await fetchGames(
+        player
+    );
 
-    if(dateSelect.value === "custom"){
+}
 
 
-        targetDate =
-        new Date(
-            customDate.value
-        );
 
 
-    }
 
+// ================================
+// START LIVE SESSION
+// ================================
 
+async function startSession(player){
 
-    // Session mode
 
-    if(
-        dateSelect.value === "session"
-    ){
+    const rating =
+    await getCurrentRating(
+        player,
+        gameType.value
+    );
 
 
-        if(
-            !localStorage.getItem(
-                "sessionStart"
-            )
-        ){
+    localStorage.setItem(
+        "sessionStart",
+        Date.now()
+    );
 
-            localStorage.setItem(
-                "sessionStart",
-                Date.now()
-            );
 
-        }
+    localStorage.setItem(
+        "sessionRating",
+        rating
+    );
 
 
-    }
+}
 
 
 
-    const year =
-    targetDate.getFullYear();
+// ================================
+// GET CURRENT RATING
+// ================================
 
+async function getCurrentRating(
+player,
+type
+){
 
 
-    const month =
-    String(
-        targetDate.getMonth()+1
-    )
-    .padStart(2,"0");
+    const response =
+    await fetch(
 
+    `https://api.chess.com/pub/player/${player}/stats`
 
+    );
 
-    try{
 
+    const data =
+    await response.json();
 
-        const response =
-        await fetch(
 
-        `https://api.chess.com/pub/player/${player}/games/${year}/${month}`
 
-        );
+    let key;
 
 
+    if(type==="bullet")
+        key="chess_bullet";
 
-        if(!response.ok){
 
-            throw new Error(
-                "Player not found"
-            );
+    if(type==="blitz")
+        key="chess_blitz";
 
-        }
 
+    if(type==="rapid")
+        key="chess_rapid";
 
 
-        const data =
-        await response.json();
 
-
-
-        let games =
-        data.games || [];
-
-
-
-
-
-        games =
-        games.filter(game=>{
-
-
-            const gameDate =
-            new Date(
-                game.end_time * 1000
-            );
-
-
-
-            // SESSION FILTER
-
-            if(
-                dateSelect.value === "session"
-            ){
-
-
-                const start =
-                Number(
-                    localStorage.getItem(
-                        "sessionStart"
-                    )
-                );
-
-
-                return (
-
-                    game.end_time * 1000
-                    >
-                    start
-
-                );
-
-            }
-
-
-
-
-            // DATE FILTER
-
-            return (
-
-                gameDate.getDate()
-                ===
-                targetDate.getDate()
-
-
-                &&
-
-
-                gameDate.getMonth()
-                ===
-                targetDate.getMonth()
-
-
-                &&
-
-
-                gameDate.getFullYear()
-                ===
-                targetDate.getFullYear()
-
-            );
-
-
-        });
-
-
-
-
-
-        // TIME CONTROL FILTER
-
-        games =
-        games.filter(game=>
-
-            game.time_class
-            ===
-            gameType.value
-
-        );
-
-
-
-
-        const previousRating =
-        await getPreviousDayRating(
-            player,
-            targetDate,
-            gameType.value
-        );
-
-
-
-        calculateStats(
-            games,
-            player,
-            previousRating
-        );
-
-
-
-    }
-    catch(error){
-
-
-        console.error(error);
-
-
-        alert(
-            "Cannot load games"
-        );
-
-
-    }
+    return (
+        data[key]
+        ?.last
+        ?.rating
+        ||
+        0
+    );
 
 
 }
@@ -406,55 +227,67 @@ async function loadGames(){
 
 
 
-
 // ================================
-// GET PREVIOUS DAY RATING
+// FETCH GAMES
 // ================================
 
-async function getPreviousDayRating(
-    player,
-    date,
-    type
-){
+async function fetchGames(player){
 
 
-    const key =
-    `rating_${player}_${date.toISOString().slice(0,10)}_${type}`;
+    let target =
+    new Date();
 
 
 
-    const cached =
-    localStorage.getItem(key);
+    if(dateSelect.value==="yesterday"){
+
+        target.setDate(
+            target.getDate()-1
+        );
+
+    }
 
 
 
-    if(cached !== null){
+    if(dateSelect.value==="custom"){
 
-        return JSON.parse(cached);
+        target =
+        new Date(
+            customDate.value
+        );
+
+    }
+
+
+
+    // SESSION DATE
+
+    if(dateSelect.value==="session"){
+
+
+        target =
+        new Date(
+            Number(
+                localStorage.getItem(
+                    "sessionStart"
+                )
+            )
+        );
+
 
     }
 
 
 
 
-    const previous =
-    new Date(date);
-
-
-
-    previous.setDate(
-        previous.getDate()-1
-    );
-
-
 
     const year =
-    previous.getFullYear();
+    target.getFullYear();
 
 
     const month =
     String(
-        previous.getMonth()+1
+    target.getMonth()+1
     )
     .padStart(2,"0");
 
@@ -480,14 +313,42 @@ async function getPreviousDayRating(
 
 
 
+
+
     games =
     games.filter(game=>{
 
 
+        const gameTime =
+        game.end_time * 1000;
+
+
+
+        // LIVE SESSION
+
+        if(
+        dateSelect.value==="session"
+        ){
+
+
+            const start =
+            Number(
+            localStorage.getItem(
+                "sessionStart"
+            ));
+
+
+            return gameTime > start;
+
+        }
+
+
+
+        // NORMAL DATE
+
+
         const d =
-        new Date(
-            game.end_time*1000
-        );
+        new Date(gameTime);
 
 
 
@@ -495,25 +356,19 @@ async function getPreviousDayRating(
 
             d.getDate()
             ===
-            previous.getDate()
+            target.getDate()
 
             &&
 
             d.getMonth()
             ===
-            previous.getMonth()
+            target.getMonth()
 
             &&
 
             d.getFullYear()
             ===
-            previous.getFullYear()
-
-            &&
-
-            game.time_class
-            ===
-            type
+            target.getFullYear()
 
         );
 
@@ -523,78 +378,37 @@ async function getPreviousDayRating(
 
 
 
-    if(games.length===0){
 
-        return null;
+    games =
+    games.filter(game=>
 
-    }
-
-
-
-    games.sort(
-        (a,b)=>
-        a.end_time-b.end_time
-    );
-
-
-
-    const last =
-    games[games.length-1];
-
-
-
-    let rating;
-
-
-
-    if(
-        last.white.username
-        .toLowerCase()
+        game.time_class
         ===
-        player
-    ){
+        gameType.value
 
-        rating =
-        last.white.rating;
-
-
-    }else{
-
-
-        rating =
-        last.black.rating;
-
-
-    }
-
-
-
-
-    localStorage.setItem(
-        key,
-        JSON.stringify(rating)
     );
 
 
 
-    return rating;
+
+
+    calculateStats(
+        games,
+        player
+    );
 
 }
 
 
 
 
-
-
-
 // ================================
-// CALCULATE
+// CALCULATE STATS
 // ================================
 
 function calculateStats(
-    games,
-    player,
-    startingRating
+games,
+player
 ){
 
 
@@ -608,8 +422,8 @@ function calculateStats(
     let ratingChange=0;
 
 
-    let previousRating =
-    startingRating;
+    let previousRating=null;
+
 
 
 
@@ -617,6 +431,25 @@ function calculateStats(
         (a,b)=>
         a.end_time-b.end_time
     );
+
+
+
+
+
+    if(
+    dateSelect.value==="session"
+    ){
+
+
+        previousRating =
+        Number(
+        localStorage.getItem(
+            "sessionRating"
+        ));
+
+
+    }
+
 
 
 
@@ -638,18 +471,19 @@ function calculateStats(
             data =
             game.white;
 
-
-        }else{
-
+        }
+        else{
 
             data =
             game.black;
-
 
         }
 
 
 
+
+
+        // RESULT
 
         switch(data.result){
 
@@ -657,9 +491,7 @@ function calculateStats(
             case "win":
 
                 wins++;
-
                 break;
-
 
 
             case "stalemate":
@@ -670,9 +502,7 @@ function calculateStats(
             case "timevsinsufficient":
 
                 draws++;
-
                 break;
-
 
 
             default:
@@ -684,10 +514,12 @@ function calculateStats(
 
 
 
+        // RATING
+
         if(
         data.rating
         &&
-        previousRating !== null
+        previousRating!==null
         ){
 
 
@@ -695,7 +527,6 @@ function calculateStats(
             data.rating
             -
             previousRating;
-
 
 
         }
@@ -732,9 +563,8 @@ function calculateStats(
     draws;
 
 
-
     ratingEl.textContent =
-    ratingChange >= 0
+    ratingChange>=0
     ?
     "+"+ratingChange
     :
@@ -743,7 +573,6 @@ function calculateStats(
 
 
 }
-
 
 
 
@@ -759,7 +588,11 @@ setInterval(()=>{
     !== ""
     ){
 
-        loadGames();
+        fetchGames(
+            playerInput.value
+            .trim()
+            .toLowerCase()
+        );
 
     }
 
