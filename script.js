@@ -141,8 +141,23 @@ dateSelect.addEventListener(
 
 searchBtn.addEventListener(
 "click",
-updateDashboard
-);
+()=>{
+
+
+    if(
+        dateSelect.value === "session"
+    ){
+
+        resetSession();
+
+    }
+
+
+
+    updateDashboard();
+
+
+});
 
 
 
@@ -745,7 +760,45 @@ function displayStats(player){
 
 }
 
+function resetSession(){
 
+    const player =
+    localStorage.getItem("player");
+
+
+    localStorage.clear();
+
+
+
+    if(player){
+
+        localStorage.setItem(
+            "player",
+            player
+        );
+
+    }
+
+
+
+    localStorage.setItem(
+        "sessionStart",
+        Date.now()
+    );
+
+
+
+    localStorage.setItem(
+        "date",
+        "session"
+    );
+
+
+    console.log(
+        "New session started"
+    );
+
+}
 
 
 
