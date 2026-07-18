@@ -898,7 +898,7 @@ function calculateRatingChange(games, player) {
 
 // Display
 const ratingChange = calculateRatingChange(
-    db,
+    games,
     player
 );
 
