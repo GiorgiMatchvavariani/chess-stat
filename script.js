@@ -143,7 +143,7 @@ searchBtn.addEventListener(
 "click",
 ()=>{
 
-
+localStorage.clear();
     if(
         dateSelect.value === "session"
     ){
