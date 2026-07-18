@@ -897,8 +897,8 @@ function calculateRatingChange(games, player) {
 
 
 // Display
-/*const ratingChange = calculateRatingChange(
-    filteredGames,
+const ratingChange = calculateRatingChange(
+    db,
     player
 );
 
@@ -909,7 +909,7 @@ ratingEl.textContent =
         : ratingChange;
 
 
-*/
+
 
 
 
