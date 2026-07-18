@@ -902,7 +902,7 @@ const ratingChange = calculateRatingChange(
     player
 );
 
-
+console.log(ratingChange)
 ratingEl.textContent =
     ratingChange >= 0
         ? `+${ratingChange}`
