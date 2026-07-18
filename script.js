@@ -20,36 +20,23 @@ const lastUpdate = document.getElementById("lastUpdate");
 
 const gamesTable = document.getElementById("gamesTable");
 
-
-
-
 // ======================================
 // LOCAL STORAGE
 // ======================================
 
-
 function getGamesDB(){
-
     return JSON.parse(
         localStorage.getItem("gamesDB")
     ) || [];
-
 }
 
-
-
 function saveGamesDB(data){
-
     localStorage.setItem(
         "gamesDB",
         JSON.stringify(data)
     );
 
 }
-
-
-
-
 
 // ======================================
 // LOAD SETTINGS
@@ -74,11 +61,6 @@ window.addEventListener("load", ()=>{
 
 
 });
-
-
-
-
-
 // ======================================
 // SAVE SETTINGS
 // ======================================
@@ -869,7 +851,62 @@ function renderHistory(db){
 
 
 }
+function calculateRatingChange(games, player) {
+    if (!games.length) return 0;
 
+    const playerGames = games
+        .filter(game =>
+            game.white.username.toLowerCase() === player.toLowerCase() ||
+            game.black.username.toLowerCase() === player.toLowerCase()
+        )
+        .sort((a, b) => a.end_time - b.end_time);
+
+
+    let startRating = null;
+    let endRating = null;
+
+
+    playerGames.forEach(game => {
+
+        const isWhite =
+            game.white.username.toLowerCase() === player.toLowerCase();
+
+        const myPlayer =
+            isWhite ? game.white : game.black;
+
+
+        if (myPlayer.rating) {
+
+            if (startRating === null) {
+                startRating = myPlayer.rating;
+            }
+
+            endRating = myPlayer.rating;
+        }
+
+    });
+
+
+    if (startRating === null || endRating === null) {
+        return 0;
+    }
+
+
+    return endRating - startRating;
+}
+
+
+// Display
+const ratingChange = calculateRatingChange(
+    filteredGames,
+    player
+);
+
+
+ratingEl.textContent =
+    ratingChange >= 0
+        ? `+${ratingChange}`
+        : ratingChange;
 
 
 
