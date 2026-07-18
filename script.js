@@ -891,13 +891,13 @@ function calculateRatingChange(games, player) {
         return 0;
     }
 
-
+    console.log(endRating - startRating)
     return endRating - startRating;
 }
 
 
 // Display
-const ratingChange = calculateRatingChange(
+/*const ratingChange = calculateRatingChange(
     filteredGames,
     player
 );
@@ -909,7 +909,7 @@ ratingEl.textContent =
         : ratingChange;
 
 
-
+*/
 
 
 
